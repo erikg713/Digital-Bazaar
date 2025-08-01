@@ -11,6 +11,22 @@ export const ItemModel = {
     );
   `,
 };
+import mongoose from 'mongoose';
+
+const itemSchema = mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String },
+    price: { type: Number, required: true },
+    stock: { type: Number, default: 0 },
+  },
+  { timestamps: true }
+);
+
+const Item = mongoose.model('Item', itemSchema);
+
+export default Item;
+
 // backend/models/itemModel.js
 import db from '../config.js';
 
