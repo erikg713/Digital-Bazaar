@@ -1,6 +1,5 @@
-// src/components/PiPayButton.jsx
 import React, { useState } from 'react';
-import { loginUser } from '../services/api';
+import { loginUser } from '../api';
 
 const onIncompletePaymentFound = async (payment) => {
   console.warn('Incomplete payment detected:', payment);
@@ -39,4 +38,3 @@ const PiPayButton = ({ onAuth }) => {
 };
 
 export default PiPayButton;
-
