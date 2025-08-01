@@ -1,13 +1,23 @@
-import mongoose from 'mongoose';
+import pkg from 'pg';
+import config from './config.js';
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
-  }
-};
+const { Pool } = pkg;
 
-export default connectDB;
+const pool = new Pool({
+  user: config.pg.user,
+  host: config.pg.host,
+  database: config.pg.database,
+  password: config.pg.password,
+  port: config.pg.port,
+});
+
+pool.on('connect', () => {
+  console.log('Connected to PostgreSQL database');
+});
+
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle PostgreSQL client', err);
+  process.exit(-1);
+});
+
+export default pool;
