@@ -1,36 +1,44 @@
 import { pool } from '../db.js';
 
-export const purchaseItem = async (req, res) => {
-  const { itemId } = req.params;
-  const { buyer_id } = req.body;
+export const startPurchase = async (req, res) => {
+  const { buyer_id, item_id, pi_payment_id } = req.body;
 
   try {
-    const result = await pool.query(
-      `INSERT INTO purchases (buyer_id, item_id)
-       VALUES ($1, $2)
-       RETURNING *`,
-      [buyer_id, itemId]
+    const existing = await pool.query(
+      `SELECT * FROM purchases WHERE pi_payment_id = $1`, [pi_payment_id]
     );
-    res.json({ message: 'Purchase recorded. Awaiting Pi payment.', purchase: result.rows[0] });
+    if (existing.rows.length > 0) return res.json(existing.rows[0]);
+
+    const result = await pool.query(
+      `INSERT INTO purchases (buyer_id, item_id, pi_payment_id)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [buyer_id, item_id, pi_payment_id]
+    );
+    res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).json({ error: 'Purchase failed', details: err });
+    res.status(500).json({ error: 'Purchase start error', details: err });
   }
 };
-import { pool } from '../db.js';
 
-export const purchaseItem = async (req, res) => {
-  const { itemId } = req.params;
-  const { buyer_id } = req.body;
+export const completePurchase = async (req, res) => {
+  const { pi_payment_id, txid } = req.body;
 
   try {
     const result = await pool.query(
-      `INSERT INTO purchases (buyer_id, item_id)
-       VALUES ($1, $2)
+      `UPDATE purchases
+       SET status = 'completed', txid = $2
+       WHERE pi_payment_id = $1
        RETURNING *`,
-      [buyer_id, itemId]
+      [pi_payment_id, txid]
     );
-    res.json({ message: 'Purchase recorded. Awaiting Pi payment.', purchase: result.rows[0] });
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Purchase not found' });
+    }
+
+    res.json({ message: 'Payment completed', purchase: result.rows[0] });
   } catch (err) {
-    res.status(500).json({ error: 'Purchase failed', details: err });
+    res.status(500).json({ error: 'Payment completion error', details: err });
   }
 };
