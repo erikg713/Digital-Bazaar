@@ -1,4 +1,28 @@
 import { pool } from '../db.js';
+import asyncHandler from 'express-async-handler';
+import Item from '../models/Item.js';
+
+// @desc    Get all items
+// @route   GET /api/items
+// @access  Public
+export const getItems = asyncHandler(async (req, res) => {
+  const items = await Item.find({});
+  res.json(items);
+});
+
+// @desc    Get single item by ID
+// @route   GET /api/items/:id
+// @access  Public
+export const getItemById = asyncHandler(async (req, res) => {
+  const item = await Item.findById(req.params.id);
+
+  if (item) {
+    res.json(item);
+  } else {
+    res.status(404);
+    throw new Error('Item not found');
+  }
+});
 
 export const uploadItem = async (req, res) => {
   const { creator_id, name, description, price_pi, file_url } = req.body;
