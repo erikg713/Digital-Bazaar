@@ -1,42 +1,33 @@
+// src/components/PiPayButton.jsx
 import React from 'react';
+import { loginUser } from '../services/api';
 
-export default function PiPayButton({ amount, memo, metadata, onPaymentSuccess }) {
-  const handleClick = async () => {
+const PiPayButton = ({ onAuth }) => {
+  const handleLogin = async () => {
+    if (!window.Pi) return alert('Pi SDK not loaded');
+
     try {
-      const paymentData = {
-        amount,
-        memo,
-        metadata,
-      };
+      const scopes = ['username', 'payments'];
+      const authResponse = await window.Pi.authenticate(scopes, onIncompletePaymentFound);
 
-      const payment = await window.Pi.createPayment(paymentData, {
-        onReadyForServerApproval: async (paymentId) => {
-          // Send paymentId to your server for approval
-          console.log('Payment ready for server approval:', paymentId);
-        },
-        onReadyForServerCompletion: async (paymentId, txid) => {
-          // Tell your server to complete the payment
-          console.log('Payment ready to be completed:', paymentId, txid);
-          onPaymentSuccess(paymentId, txid);
-        },
-        onCancel: (reason) => {
-          console.warn('Payment canceled:', reason);
-        },
-        onError: (error) => {
-          console.error('Payment error:', error);
-        },
-      });
-    } catch (error) {
-      console.error('Pi Payment failed:', error);
+      // Send the authenticated Pi user to your backend
+      const user = await loginUser(authResponse.user);
+      onAuth(user);
+    } catch (err) {
+      console.error('Pi Auth Error:', err);
     }
   };
 
+  const onIncompletePaymentFound = async (payment) => {
+    console.warn('Incomplete payment detected:', payment);
+    // optionally notify backend to handle
+  };
+
   return (
-    <button
-      onClick={handleClick}
-      className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded font-semibold"
-    >
-      Pay with Pi
+    <button onClick={handleLogin} className="bg-yellow-400 text-black px-4 py-2 rounded">
+      Sign in with Pi
     </button>
   );
-}
+};
+
+export default PiPayButton;
