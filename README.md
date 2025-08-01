@@ -34,6 +34,8 @@ Backend	Node.js (Express) + PostgreSQL
 Auth & Payment	Pi Network SDK (user auth + payment)
 Hosting	Pi Browser (for launch) + Vercel (fallback)
 
+npm install express cors
+
 
 🧪 MVP Features
 
