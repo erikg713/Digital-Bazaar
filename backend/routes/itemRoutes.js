@@ -1,5 +1,13 @@
 import express from 'express';
-import { uploadItem, getItems } from '../controllers/itemController.js';
+import { getItems, getItemById } from '../controllers/itemController.js';
+
+const router = express.Router();
+
+router.get('/', getItems);
+router.get('/:id', getItemById);
+
+export default router;
+
 const router = express.Router();
 
 router.post('/', uploadItem);
