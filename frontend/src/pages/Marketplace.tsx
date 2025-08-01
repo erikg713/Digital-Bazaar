@@ -16,7 +16,24 @@ export default function Marketplace() {
       memo: `Purchase of ${item.name}`,
       metadata: { itemId: item.id, buyerId: user.id },
     };
-
+const callbacks = {
+  async onReadyForServerApproval(paymentId: string) {
+    await API.post('/purchase/start', {
+      pi_payment_id: paymentId,
+      buyer_id: user.id,
+      item_id: item.id,
+    });
+    console.log('[Pi] Payment ready for server approval.');
+  },
+  async onReadyForServerCompletion(paymentId: string, txid: string) {
+    await API.post('/purchase/complete', {
+      pi_payment_id: paymentId,
+      txid,
+    });
+    alert('Purchase complete! Download now available.');
+  },
+  ...
+};
     const callbacks = {
       onReadyForServerApproval(paymentId: string) {
         console.log('Ready for server approval:', paymentId);
