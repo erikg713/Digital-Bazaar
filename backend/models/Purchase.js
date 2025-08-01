@@ -1,24 +1,24 @@
-export const PurchaseModel = {
-  createTable: `
-    CREATE TABLE IF NOT EXISTS purchases (
-      id SERIAL PRIMARY KEY,
-      buyer_id INTEGER REFERENCES users(id),
-      item_id INTEGER REFERENCES items(id),
-      status TEXT DEFAULT 'pending',
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-  `,
-};
-export const PurchaseModel = {
-  createTable: `
-    CREATE TABLE IF NOT EXISTS purchases (
-      id SERIAL PRIMARY KEY,
-      buyer_id INTEGER REFERENCES users(id),
-      item_id INTEGER REFERENCES items(id),
-      pi_payment_id TEXT UNIQUE,
-      status TEXT DEFAULT 'pending',
-      txid TEXT,
-      created_at TIMESTAMP DEFAULT NOW()
-    );
-  `,
-};
+import mongoose from 'mongoose';
+
+const purchaseSchema = mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'User',
+    },
+    item: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Item',
+    },
+    quantity: { type: Number, default: 1 },
+    totalPrice: { type: Number, required: true },
+    purchaseDate: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
+);
+
+const Purchase = mongoose.model('Purchase', purchaseSchema);
+
+export default Purchase;
