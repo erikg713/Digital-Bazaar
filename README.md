@@ -88,6 +88,7 @@ Build API so Pi-based games can auto-import purchased assets
 Add AI-generated item tools for creators
 
 ### Backend File Structure ###
+```
 backend/
 ├── controllers/
 │   ├── authController.js
@@ -105,3 +106,4 @@ backend/
 ├── server.js
 ├── db.js
 └── .env
+```
